@@ -17,6 +17,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { LoadingSpinner } from './loading-spinner';
+import { storage } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { X, Upload } from 'lucide-react';
 
 interface ProjectFormProps {
   open: boolean;
@@ -44,6 +47,8 @@ export function ProjectForm({ open, onOpenChange, onSuccess }: ProjectFormProps)
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [uploadingImages, setUploadingImages] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,8 +67,15 @@ export function ProjectForm({ open, onOpenChange, onSuccess }: ProjectFormProps)
     setError(null);
 
     try {
-      await createProject(user.uid, formData);
+      let imageUrls: string[] = [];
+
+      if (selectedFiles.length > 0) {
+        imageUrls = await uploadImages();
+      }
+
+      await createProject(user.uid, formData, imageUrls);
       setFormData({ title: '', description: '', category: '' });
+      setSelectedFiles([]);
       onOpenChange(false);
       onSuccess?.();
     } catch (err) {
@@ -76,6 +88,50 @@ export function ProjectForm({ open, onOpenChange, onSuccess }: ProjectFormProps)
   const handleInputChange = (field: keyof ProjectFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (error) setError(null);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+
+    if (imageFiles.length !== files.length) {
+      setError('Please select only image files');
+      return;
+    }
+
+    if (selectedFiles.length + imageFiles.length > 5) {
+      setError('Maximum 5 images allowed');
+      return;
+    }
+
+    setSelectedFiles(prev => [...prev, ...imageFiles]);
+    if (error) setError(null);
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const uploadImages = async (): Promise<string[]> => {
+    if (selectedFiles.length === 0) return [];
+
+    setUploadingImages(true);
+    const uploadPromises = selectedFiles.map(async (file) => {
+      const timestamp = Date.now();
+      const fileName = `${timestamp}_${file.name}`;
+      const storageRef = ref(storage, `projects/${user!.uid}/${fileName}`);
+
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      return downloadURL;
+    });
+
+    try {
+      const urls = await Promise.all(uploadPromises);
+      return urls;
+    } finally {
+      setUploadingImages(false);
+    }
   };
 
   return (
@@ -144,6 +200,56 @@ export function ProjectForm({ open, onOpenChange, onSuccess }: ProjectFormProps)
                 required
                 className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 focus:border-blue-500 focus:ring-blue-500/20 resize-none"
               />
+            </div>
+            <div className="grid gap-2">
+              <label htmlFor="images" className="text-sm font-medium text-gray-300">
+                Project Images (Optional)
+              </label>
+              <div className="space-y-3">
+                <div className="flex items-center justify-center w-full">
+                  <label
+                    htmlFor="images"
+                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-700 border-dashed rounded-lg cursor-pointer bg-gray-800/50 hover:bg-gray-800 transition-colors"
+                  >
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <Upload className="w-8 h-8 mb-2 text-gray-400" />
+                      <p className="mb-2 text-sm text-gray-400">
+                        <span className="font-semibold">Click to upload</span> or drag and drop
+                      </p>
+                      <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB (max 5 images)</p>
+                    </div>
+                    <Input
+                      id="images"
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      disabled={loading || uploadingImages}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                {selectedFiles.length > 0 && (
+                  <div className="grid grid-cols-2 gap-2">
+                    {selectedFiles.map((file, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={`Preview ${index + 1}`}
+                          className="w-full h-24 object-cover rounded-lg border border-gray-700"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeFile(index)}
+                          className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
             {error && (
               <div className="text-sm text-red-400 bg-red-900/20 border border-red-800 p-3 rounded-lg">

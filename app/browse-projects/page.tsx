@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/auth-context';
 import { Project } from '@/lib/types';
 import { subscribeToAllProjects } from '@/lib/firestore';
 import { ProjectCard } from '@/components/project-card';
@@ -10,11 +9,9 @@ import { LoadingSpinner } from '@/components/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Filter, Grid, List, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
+import { Search, Filter, Grid, List } from 'lucide-react';
 
 export default function BrowseProjects() {
-  const { user } = useAuth();
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,27 +65,6 @@ export default function BrowseProjects() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="border-b border-gray-800 px-8 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href={user ? '/' : '/'} className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
-            </Link>
-            <div className="h-4 w-px bg-gray-700" />
-            <h1 className="text-2xl font-bold">Browse Projects</h1>
-          </div>
-          {user && (
-            <Link href="/">
-              <Button className="bg-blue-600 hover:bg-blue-700">
-                My Dashboard
-              </Button>
-            </Link>
-          )}
-        </div>
-      </header>
-
       <main className="max-w-7xl mx-auto px-8 py-8">
         {/* Hero Section */}
         <div className="text-center mb-12">

@@ -24,7 +24,7 @@ import { Project, ProjectFormData } from './types';
 const PROJECTS_COLLECTION = 'projects';
 
 // Create a new project
-export async function createProject(userId: string, data: ProjectFormData): Promise<string> {
+export async function createProject(userId: string, data: ProjectFormData, imageUrls?: string[]): Promise<string> {
   try {
     const now = Timestamp.now();
     const projectData = {
@@ -33,6 +33,7 @@ export async function createProject(userId: string, data: ProjectFormData): Prom
       createdAt: now,
       updatedAt: now,
       status: 'active' as const,
+      ...(imageUrls && imageUrls.length > 0 && { imageUrls }),
     };
 
     const docRef = await addDoc(collection(db, PROJECTS_COLLECTION), projectData);

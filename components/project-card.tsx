@@ -76,6 +76,34 @@ export function ProjectCard({ project, onEdit, onDelete, onClick, clickable = fa
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
+        {project.imageUrls && project.imageUrls.length > 0 && (
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            {project.imageUrls.slice(0, 2).map((url, index) => (
+              <img
+                key={index}
+                src={url}
+                alt={`${project.title} image ${index + 1}`}
+                className="w-full h-24 object-cover rounded-lg border border-gray-700"
+              />
+            ))}
+            {project.imageUrls.length > 2 && (
+              <div className="relative">
+                <img
+                  src={project.imageUrls[2]}
+                  alt={`${project.title} image 3`}
+                  className="w-full h-24 object-cover rounded-lg border border-gray-700"
+                />
+                {project.imageUrls.length > 3 && (
+                  <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+                    <span className="text-white text-sm font-semibold">
+                      +{project.imageUrls.length - 3}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
         <CardDescription className="text-gray-400 line-clamp-3 leading-relaxed">
           {project.description}
         </CardDescription>

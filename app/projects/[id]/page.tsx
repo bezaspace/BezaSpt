@@ -9,7 +9,7 @@ import { LoadingSpinner } from '@/components/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Calendar, User, Tag, Edit, Trash2 } from 'lucide-react';
+import { Calendar, User, Tag, Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ProjectDetailPage() {
@@ -89,14 +89,6 @@ export default function ProjectDetailPage() {
   if (error || !project) {
     return (
       <div className="min-h-screen bg-black text-white">
-        <header className="border-b border-gray-800 px-8 py-4">
-          <div className="max-w-4xl mx-auto">
-            <Link href="/browse-projects" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Browse Projects
-            </Link>
-          </div>
-        </header>
         <main className="max-w-4xl mx-auto px-8 py-8">
           <div className="text-center py-12">
             <h1 className="text-2xl font-bold text-white mb-4">
@@ -118,23 +110,6 @@ export default function ProjectDetailPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="border-b border-gray-800 px-8 py-4">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <Link href="/browse-projects" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Browse Projects
-          </Link>
-          {user && (
-            <Link href="/">
-              <Button variant="outline" className="border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white">
-                My Dashboard
-              </Button>
-            </Link>
-          )}
-        </div>
-      </header>
-
       <main className="max-w-4xl mx-auto px-8 py-8">
         {/* Project Header */}
         <div className="mb-8">
@@ -179,6 +154,38 @@ export default function ProjectDetailPage() {
             )}
           </div>
         </div>
+
+        {/* Project Images */}
+        {project.imageUrls && project.imageUrls.length > 0 && (
+          <div className="mb-8">
+            <Card className="bg-gray-900/50 border-gray-800">
+              <CardHeader>
+                <CardTitle className="text-white">Project Images</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {project.imageUrls.map((url, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={url}
+                        alt={`${project.title} image ${index + 1}`}
+                        className="w-full h-48 object-cover rounded-lg border border-gray-700 hover:border-gray-600 transition-colors cursor-pointer"
+                        onClick={() => {
+                          // Open image in new tab for full view
+                          window.open(url, '_blank');
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-lg transition-colors pointer-events-none" />
+                    </div>
+                  ))}
+                </div>
+                <p className="text-sm text-gray-400 mt-4">
+                  Click on any image to view in full size
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Project Content */}
         <div className="grid gap-8 lg:grid-cols-3">

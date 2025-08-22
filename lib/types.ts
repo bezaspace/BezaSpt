@@ -9,6 +9,7 @@ export interface Project {
   createdAt: Timestamp;
   updatedAt: Timestamp;
   status: 'active' | 'completed' | 'archived';
+  imageUrls?: string[]; // Array of Firebase Storage download URLs
 }
 
 export interface ProjectFormData {
