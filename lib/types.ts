@@ -18,6 +18,25 @@ export interface ProjectFormData {
   category: string;
 }
 
+export interface UserProfile {
+  uid: string;
+  displayName: string;
+  email: string;
+  photoURL: string | null;
+  bio: string | null;
+  username: string | null;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface UserSearchResult {
+  uid: string;
+  displayName: string;
+  photoURL: string | null;
+  username: string | null;
+  bio: string | null;
+}
+
 export interface ProjectContextType {
   projects: Project[];
   loading: boolean;
@@ -26,4 +45,12 @@ export interface ProjectContextType {
   updateProject: (id: string, data: Partial<ProjectFormData>) => Promise<void>;
   deleteProject: (id: string) => Promise<void>;
   refreshProjects: () => Promise<void>;
+}
+
+export interface SearchContextType {
+  searchQuery: string;
+  searchResults: UserSearchResult[];
+  isSearching: boolean;
+  setSearchQuery: (query: string) => void;
+  clearSearch: () => void;
 }

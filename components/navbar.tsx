@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { AuthButton } from '@/components/auth-button';
-import { Button } from '@/components/ui/button';
+import { SearchBar } from '@/components/search-bar';
 
 export function Navbar() {
   const { user } = useAuth();
@@ -32,8 +32,9 @@ export function Navbar() {
           </Link>
         </div>
 
-        {/* User Actions */}
+        {/* Search and User Actions */}
         <div className="flex items-center gap-4">
+          {user && <SearchBar />}
           {user && (
             <span className="text-sm text-gray-400 hidden sm:block">
               Welcome, {user.displayName}
