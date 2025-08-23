@@ -9,7 +9,7 @@ import { LoadingSpinner } from '@/components/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, User, Tag, Edit, Trash2 } from 'lucide-react';
+import { Calendar, User, Tag, Edit, Trash2, Target, MapPin, Code, TrendingUp, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ProjectDetailPage() {
@@ -203,7 +203,296 @@ export default function ProjectDetailPage() {
               </CardContent>
             </Card>
 
-            {/* Additional Content Placeholder */}
+            {/* Goals */}
+            {project.goals && project.goals.length > 0 && (
+              <Card className="bg-gray-900/50 border-gray-800">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Target className="h-5 w-5" />
+                    Project Goals
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {project.goals.map((goal, index) => (
+                      <div key={index} className="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
+                        <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <span className="text-xs text-white font-semibold">{index + 1}</span>
+                        </div>
+                        <p className="text-gray-300">{goal}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Outcomes */}
+            {project.outcomes && project.outcomes.length > 0 && (
+              <Card className="bg-gray-900/50 border-gray-800">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5" />
+                    Expected Outcomes
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {project.outcomes.map((outcome, index) => (
+                      <div key={index} className="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
+                        <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <CheckCircle className="h-3 w-3 text-white" />
+                        </div>
+                        <p className="text-gray-300">{outcome}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Technologies */}
+            {project.technologies && project.technologies.length > 0 && (
+              <Card className="bg-gray-900/50 border-gray-800">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Code className="h-5 w-5" />
+                    Technologies
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {project.technologies.map((tech, index) => (
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="text-sm bg-blue-600/20 text-blue-400 border-blue-600/30 hover:bg-blue-600/30"
+                      >
+                        {tech}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Roadmap */}
+            {project.roadmap && project.roadmap.length > 0 && (
+              <Card className="bg-gray-900/50 border-gray-800">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Target className="h-5 w-5" />
+                    Project Roadmap
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {project.roadmap.map((milestone, index) => (
+                      <div key={milestone.id || index} className="flex items-start gap-4 p-4 bg-gray-800/50 rounded-lg">
+                        <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <span className="text-xs text-white font-semibold">{index + 1}</span>
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="text-white font-medium">{milestone.title}</h4>
+                          {milestone.description && (
+                            <p className="text-gray-400 text-sm mt-1">{milestone.description}</p>
+                          )}
+                          <div className="flex items-center gap-4 mt-2">
+                            <div className={`px-2 py-1 rounded text-xs ${
+                              milestone.status === 'completed' ? 'bg-green-600/20 text-green-400' :
+                              milestone.status === 'in-progress' ? 'bg-blue-600/20 text-blue-400' :
+                              'bg-gray-600/20 text-gray-400'
+                            }`}>
+                              {milestone.status}
+                            </div>
+                            {milestone.dueDate && (
+                              <span className="text-xs text-gray-400">
+                                Due: {formatDate(milestone.dueDate)}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* People Needed / Roles */}
+            {project.peopleNeeded && (project.peopleNeeded.roles.length > 0 || project.peopleNeeded.skills.length > 0) && (
+              <Card className="bg-gray-900/50 border-gray-800">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <User className="h-5 w-5" />
+                    People Needed ({project.peopleNeeded.count})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {project.peopleNeeded.roles.length > 0 && (
+                      <div>
+                        <h4 className="text-gray-400 text-sm mb-2">Roles Required:</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {project.peopleNeeded.roles.map((role, index) => (
+                            <Badge
+                              key={index}
+                              variant="secondary"
+                              className="text-sm bg-purple-600/20 text-purple-400 border-purple-600/30"
+                            >
+                              {role}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {project.peopleNeeded.skills.length > 0 && (
+                      <div>
+                        <h4 className="text-gray-400 text-sm mb-2">Required Skills:</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {project.peopleNeeded.skills.map((skill, index) => (
+                            <Badge
+                              key={index}
+                              variant="secondary"
+                              className="text-sm bg-green-600/20 text-green-400 border-green-600/30"
+                            >
+                              {skill}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Location */}
+            {project.location && project.location.type && (
+              <Card className="bg-gray-900/50 border-gray-800">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <MapPin className="h-5 w-5" />
+                    Location
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-400">Type:</span>
+                      <Badge variant="secondary" className="bg-gray-600/20 text-gray-300 border-gray-600/30">
+                        {project.location.type}
+                      </Badge>
+                    </div>
+                    {project.location.city && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-400">City:</span>
+                        <span className="text-white">{project.location.city}</span>
+                      </div>
+                    )}
+                    {project.location.country && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-400">Country:</span>
+                        <span className="text-white">{project.location.country}</span>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Progress */}
+            {project.progress && (
+              <Card className="bg-gray-900/50 border-gray-800">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5" />
+                    Progress
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-400">Overall Progress</span>
+                      <span className="text-white font-semibold">{project.progress.overall}%</span>
+                    </div>
+                    <div className="w-full bg-gray-700 rounded-full h-3">
+                      <div
+                        className="bg-blue-500 h-3 rounded-full transition-all duration-300"
+                        style={{ width: `${project.progress.overall}%` }}
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-400">Tasks Completed:</span>
+                        <span className="text-white ml-2">{project.progress.tasksCompleted} / {project.progress.totalTasks}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Last Updated:</span>
+                        <span className="text-white ml-2">{formatDate(project.progress.lastUpdated)}</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Tasks */}
+            {project.tasks && project.tasks.length > 0 && (
+              <Card className="bg-gray-900/50 border-gray-800">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5" />
+                    Tasks ({project.tasks.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {project.tasks.map((task, index) => (
+                      <div key={index} className="flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg">
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                          task.status === 'done' ? 'bg-green-600' :
+                          task.status === 'in-progress' ? 'bg-blue-600' : 'bg-gray-600'
+                        }`}>
+                          {task.status === 'done' ? (
+                            <CheckCircle className="h-3 w-3 text-white" />
+                          ) : task.status === 'in-progress' ? (
+                            <Clock className="h-3 w-3 text-white" />
+                          ) : (
+                            <AlertCircle className="h-3 w-3 text-white" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-white font-medium">{task.title}</p>
+                          {task.description && (
+                            <p className="text-gray-400 text-sm mt-1">{task.description}</p>
+                          )}
+                          <div className="flex items-center gap-2 mt-2">
+                            <Badge
+                              variant="secondary"
+                              className={`text-xs ${
+                                task.priority === 'high' ? 'bg-red-600/20 text-red-400 border-red-600/30' :
+                                task.priority === 'medium' ? 'bg-yellow-600/20 text-yellow-400 border-yellow-600/30' :
+                                'bg-green-600/20 text-green-400 border-green-600/30'
+                              }`}
+                            >
+                              {task.priority}
+                            </Badge>
+                            {task.dueDate && (
+                              <span className="text-xs text-gray-400">
+                                Due: {formatDate(task.dueDate)}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Project Details */}
             <Card className="bg-gray-900/50 border-gray-800">
               <CardHeader>
                 <CardTitle className="text-white">Project Details</CardTitle>
@@ -296,15 +585,43 @@ export default function ProjectDetailPage() {
                 <CardTitle className="text-white">Project Stats</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 gap-4 text-center">
-                  <div>
-                    <p className="text-2xl font-bold text-white">0</p>
-                    <p className="text-sm text-gray-400">Collaborators</p>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4 text-center">
+                    <div>
+                      <p className="text-2xl font-bold text-white">
+                        {project.tasks ? project.tasks.length : 0}
+                      </p>
+                      <p className="text-sm text-gray-400">Total Tasks</p>
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-white">
+                        {project.tasks ? project.tasks.filter(t => t.status === 'done').length : 0}
+                      </p>
+                      <p className="text-sm text-gray-400">Completed</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-2xl font-bold text-white">0</p>
-                    <p className="text-sm text-gray-400">Views</p>
+                  <div className="grid grid-cols-2 gap-4 text-center">
+                    <div>
+                      <p className="text-2xl font-bold text-white">
+                        {project.technologies ? project.technologies.length : 0}
+                      </p>
+                      <p className="text-sm text-gray-400">Technologies</p>
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-white">
+                        {project.goals ? project.goals.length : 0}
+                      </p>
+                      <p className="text-sm text-gray-400">Goals</p>
+                    </div>
                   </div>
+                  {project.progress && (
+                    <div className="pt-2 border-t border-gray-700">
+                      <div className="text-center">
+                        <p className="text-lg font-bold text-white">{project.progress.overall}%</p>
+                        <p className="text-sm text-gray-400">Overall Progress</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

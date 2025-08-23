@@ -4,7 +4,7 @@ import { Project } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Calendar } from 'lucide-react';
+import { MoreHorizontal, Calendar, MapPin, Code, Target, TrendingUp, User } from 'lucide-react';
 
 interface ProjectCardProps {
   project: Project;
@@ -107,6 +107,122 @@ export function ProjectCard({ project, onEdit, onDelete, onClick, clickable = fa
         <CardDescription className="text-gray-400 line-clamp-3 leading-relaxed">
           {project.description}
         </CardDescription>
+
+        {/* Technologies */}
+        {project.technologies && project.technologies.length > 0 && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-1 text-xs text-gray-500">
+              <Code className="h-3 w-3" />
+              <span>Technologies</span>
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {project.technologies.slice(0, 3).map((tech, index) => (
+                <Badge
+                  key={index}
+                  variant="secondary"
+                  className="text-xs bg-blue-600/20 text-blue-400 border-blue-600/30"
+                >
+                  {tech}
+                </Badge>
+              ))}
+              {project.technologies.length > 3 && (
+                <Badge
+                  variant="secondary"
+                  className="text-xs bg-gray-600/20 text-gray-400 border-gray-600/30"
+                >
+                  +{project.technologies.length - 3}
+                </Badge>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Location */}
+        {project.location && project.location.type && (
+          <div className="flex items-center gap-2 text-xs text-gray-500">
+            <MapPin className="h-3 w-3" />
+            <span className="capitalize">{project.location.type}</span>
+            {project.location.city && (
+              <span className="text-gray-400">• {project.location.city}</span>
+            )}
+          </div>
+        )}
+
+        {/* Goals */}
+        {project.goals && project.goals.length > 0 && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-1 text-xs text-gray-500">
+              <Target className="h-3 w-3" />
+              <span>Goals ({project.goals.length})</span>
+            </div>
+            <div className="text-xs text-gray-400 line-clamp-2">
+              {project.goals[0]}
+              {project.goals.length > 1 && ` + ${project.goals.length - 1} more`}
+            </div>
+          </div>
+        )}
+
+        {/* Roadmap Preview */}
+        {project.roadmap && project.roadmap.length > 0 && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-1 text-xs text-gray-500">
+              <Target className="h-3 w-3" />
+              <span>Roadmap ({project.roadmap.length} steps)</span>
+            </div>
+            <div className="text-xs text-gray-400 line-clamp-1">
+              {project.roadmap[0]?.title}
+              {project.roadmap.length > 1 && ` + ${project.roadmap.length - 1} more`}
+            </div>
+          </div>
+        )}
+
+        {/* People Needed Preview */}
+        {project.peopleNeeded && (project.peopleNeeded.roles.length > 0 || project.peopleNeeded.skills.length > 0) && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-1 text-xs text-gray-500">
+              <User className="h-3 w-3" />
+              <span>Needs {project.peopleNeeded.count} people</span>
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {project.peopleNeeded.roles.slice(0, 2).map((role, index) => (
+                <Badge
+                  key={index}
+                  variant="secondary"
+                  className="text-xs bg-purple-600/20 text-purple-400 border-purple-600/30"
+                >
+                  {role}
+                </Badge>
+              ))}
+              {project.peopleNeeded.roles.length > 2 && (
+                <Badge
+                  variant="secondary"
+                  className="text-xs bg-gray-600/20 text-gray-400 border-gray-600/30"
+                >
+                  +{project.peopleNeeded.roles.length - 2}
+                </Badge>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Progress */}
+        {project.progress && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs text-gray-500">
+              <div className="flex items-center gap-1">
+                <TrendingUp className="h-3 w-3" />
+                <span>Progress</span>
+              </div>
+              <span>{project.progress.overall}%</span>
+            </div>
+            <div className="w-full bg-gray-700 rounded-full h-1.5">
+              <div
+                className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
+                style={{ width: `${project.progress.overall}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         <div className="flex items-center justify-between text-xs text-gray-500">
           <div className="flex items-center gap-2">
