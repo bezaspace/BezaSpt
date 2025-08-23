@@ -177,22 +177,28 @@ export function ProjectCard({ project, onEdit, onDelete, onClick, clickable = fa
         )}
 
         {/* People Needed Preview */}
-        {project.peopleNeeded && (project.peopleNeeded.roles.length > 0 || project.peopleNeeded.skills.length > 0) && (
+        {project.peopleNeeded && project.peopleNeeded.roles.length > 0 && (
           <div className="space-y-2">
             <div className="flex items-center gap-1 text-xs text-gray-500">
               <User className="h-3 w-3" />
               <span>Needs {project.peopleNeeded.count} people</span>
             </div>
             <div className="flex flex-wrap gap-1">
-              {project.peopleNeeded.roles.slice(0, 2).map((role, index) => (
-                <Badge
-                  key={index}
-                  variant="secondary"
-                  className="text-xs bg-purple-600/20 text-purple-400 border-purple-600/30"
-                >
-                  {role}
-                </Badge>
-              ))}
+              {project.peopleNeeded.roles.slice(0, 2).map((role, index) => {
+                // Handle both old string format and new ProjectRole format
+                const roleName = typeof role === 'string' ? role : role.name;
+                const roleKey = typeof role === 'string' ? index : role.id;
+
+                return (
+                  <Badge
+                    key={roleKey}
+                    variant="secondary"
+                    className="text-xs bg-purple-600/20 text-purple-400 border-purple-600/30"
+                  >
+                    {roleName}
+                  </Badge>
+                );
+              })}
               {project.peopleNeeded.roles.length > 2 && (
                 <Badge
                   variant="secondary"

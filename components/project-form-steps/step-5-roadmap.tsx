@@ -7,19 +7,19 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2 } from 'lucide-react';
 
-interface Step3RoadmapProps {
+interface Step5RoadmapProps {
   formData: ProjectFormData;
   onAddRoadmapItem: (title: string, description: string) => void;
   onRemoveRoadmapItem: (index: number) => void;
   loading: boolean;
 }
 
-export function Step3Roadmap({
+export function Step5Roadmap({
   formData,
   onAddRoadmapItem,
   onRemoveRoadmapItem,
   loading
-}: Step3RoadmapProps) {
+}: Step5RoadmapProps) {
   const [currentRoadmapTitle, setCurrentRoadmapTitle] = useState('');
   const [currentRoadmapDescription, setCurrentRoadmapDescription] = useState('');
 

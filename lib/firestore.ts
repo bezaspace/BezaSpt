@@ -411,11 +411,20 @@ export async function searchProjects(filters: {
 
     if (filters.skills && filters.skills.length > 0) {
       projects = projects.filter(p =>
-        p.peopleNeeded?.skills?.some(skill =>
-          filters.skills!.some(filterSkill =>
-            skill.toLowerCase().includes(filterSkill.toLowerCase())
-          )
-        )
+        p.peopleNeeded?.roles?.some((role: any) => {
+          // Handle both old string format and new ProjectRole format
+          if (typeof role === 'string') {
+            return filters.skills!.some((filterSkill: string) =>
+              role.toLowerCase().includes(filterSkill.toLowerCase())
+            );
+          } else {
+            return role.skills?.some((skill: string) =>
+              filters.skills!.some((filterSkill: string) =>
+                skill.toLowerCase().includes(filterSkill.toLowerCase())
+              )
+            );
+          }
+        })
       );
     }
 

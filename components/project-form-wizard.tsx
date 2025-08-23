@@ -7,16 +7,18 @@ import { ProjectFormData } from '@/lib/types';
 import { Timestamp } from 'firebase/firestore';
 import { WizardNavigation } from './wizard-navigation';
 import { Step1Basic } from './project-form-steps/step-1-basic';
-import { Step2Details } from './project-form-steps/step-2-details';
-import { Step3Roadmap } from './project-form-steps/step-3-roadmap';
-import { Step4Team } from './project-form-steps/step-4-team';
+import { Step2Goals } from './project-form-steps/step-2-goals';
+import { Step3Outcomes } from './project-form-steps/step-3-outcomes';
+import { Step4Technologies } from './project-form-steps/step-4-technologies';
+import { Step5Roadmap } from './project-form-steps/step-5-roadmap';
+import { Step6Team } from './project-form-steps/step-6-team';
 
 interface ProjectFormWizardProps {
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
 }
 
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 6;
 
 export function ProjectFormWizard({ onOpenChange, onSuccess }: ProjectFormWizardProps) {
   const { user } = useAuth();
@@ -31,8 +33,7 @@ export function ProjectFormWizard({ onOpenChange, onSuccess }: ProjectFormWizard
     roadmap: [],
     peopleNeeded: {
       roles: [],
-      count: 0,
-      skills: []
+      count: 0
     },
     resources: [],
     location: {
@@ -114,45 +115,7 @@ export function ProjectFormWizard({ onOpenChange, onSuccess }: ProjectFormWizard
     }));
   };
 
-  const addRole = (role: string) => {
-    setFormData(prev => ({
-      ...prev,
-      peopleNeeded: {
-        ...prev.peopleNeeded!,
-        roles: [...(prev.peopleNeeded?.roles || []), role]
-      }
-    }));
-  };
 
-  const removeRole = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      peopleNeeded: {
-        ...prev.peopleNeeded!,
-        roles: (prev.peopleNeeded?.roles || []).filter((_, i) => i !== index)
-      }
-    }));
-  };
-
-  const addSkill = (skill: string) => {
-    setFormData(prev => ({
-      ...prev,
-      peopleNeeded: {
-        ...prev.peopleNeeded!,
-        skills: [...(prev.peopleNeeded?.skills || []), skill]
-      }
-    }));
-  };
-
-  const removeSkill = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      peopleNeeded: {
-        ...prev.peopleNeeded!,
-        skills: (prev.peopleNeeded?.skills || []).filter((_, i) => i !== index)
-      }
-    }));
-  };
 
   const updateFormData = (updates: Partial<ProjectFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
@@ -171,6 +134,8 @@ export function ProjectFormWizard({ onOpenChange, onSuccess }: ProjectFormWizard
       case 2:
       case 3:
       case 4:
+      case 5:
+      case 6:
         return true;
       default:
         return false;
@@ -200,6 +165,11 @@ export function ProjectFormWizard({ onOpenChange, onSuccess }: ProjectFormWizard
       return;
     }
 
+    if (currentStep !== TOTAL_STEPS) {
+      setError('Please complete all steps before submitting');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -215,8 +185,7 @@ export function ProjectFormWizard({ onOpenChange, onSuccess }: ProjectFormWizard
         roadmap: [],
         peopleNeeded: {
           roles: [],
-          count: 0,
-          skills: []
+          count: 0
         },
         resources: [],
         location: {
@@ -250,35 +219,45 @@ export function ProjectFormWizard({ onOpenChange, onSuccess }: ProjectFormWizard
         );
       case 2:
         return (
-          <Step2Details
+          <Step2Goals
             formData={formData}
             onAddGoal={addGoal}
             onRemoveGoal={removeGoal}
-            onAddOutcome={addOutcome}
-            onRemoveOutcome={removeOutcome}
-            onAddTechnology={addTechnology}
-            onRemoveTechnology={removeTechnology}
             loading={loading}
           />
         );
       case 3:
         return (
-          <Step3Roadmap
+          <Step3Outcomes
+            formData={formData}
+            onAddOutcome={addOutcome}
+            onRemoveOutcome={removeOutcome}
+            loading={loading}
+          />
+        );
+      case 4:
+        return (
+          <Step4Technologies
+            formData={formData}
+            onAddTechnology={addTechnology}
+            onRemoveTechnology={removeTechnology}
+            loading={loading}
+          />
+        );
+      case 5:
+        return (
+          <Step5Roadmap
             formData={formData}
             onAddRoadmapItem={addRoadmapItem}
             onRemoveRoadmapItem={removeRoadmapItem}
             loading={loading}
           />
         );
-      case 4:
+      case 6:
         return (
-          <Step4Team
+          <Step6Team
             formData={formData}
             onUpdate={updateFormData}
-            onAddRole={addRole}
-            onRemoveRole={removeRole}
-            onAddSkill={addSkill}
-            onRemoveSkill={removeSkill}
             loading={loading}
           />
         );

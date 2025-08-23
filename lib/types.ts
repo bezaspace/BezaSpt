@@ -19,13 +19,21 @@ export interface Resource {
 }
 
 export interface ProjectTask {
-  id: string;
-  title: string;
-  description: string;
-  status: 'todo' | 'in-progress' | 'done';
-  assignedTo?: string;
-  priority: 'low' | 'medium' | 'high';
-  dueDate?: Timestamp;
+   id: string;
+   title: string;
+   description: string;
+   status: 'todo' | 'in-progress' | 'done';
+   assignedTo?: string;
+   priority: 'low' | 'medium' | 'high';
+   dueDate?: Timestamp;
+}
+
+export interface ProjectRole {
+   id: string;
+   name: string;
+   responsibilities: string[];
+   skills: string[];
+   contributions: string[];
 }
 
 export interface Project {
@@ -44,11 +52,10 @@ export interface Project {
   outcomes?: string[];
   milestones?: Milestone[];
   roadmap?: Milestone[]; // Chronological order of things to be done
-  peopleNeeded?: {
-    roles: string[];
-    count: number;
-    skills: string[];
-  };
+   peopleNeeded?: {
+     roles: ProjectRole[];
+     count: number;
+   };
   resources?: Resource[];
   location?: {
     type: 'remote' | 'onsite' | 'hybrid';
@@ -73,13 +80,12 @@ export interface ProjectFormData {
   goals?: string[];
   outcomes?: string[];
   milestones?: Milestone[];
-  roadmap?: Milestone[];
-  peopleNeeded?: {
-    roles: string[];
-    count: number;
-    skills: string[];
-  };
-  resources?: Resource[];
+   roadmap?: Milestone[];
+   peopleNeeded?: {
+     roles: ProjectRole[];
+     count: number;
+   };
+   resources?: Resource[];
   location?: {
     type: 'remote' | 'onsite' | 'hybrid';
     address?: string;

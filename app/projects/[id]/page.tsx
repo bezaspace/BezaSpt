@@ -320,7 +320,7 @@ export default function ProjectDetailPage() {
             )}
 
             {/* People Needed / Roles */}
-            {project.peopleNeeded && (project.peopleNeeded.roles.length > 0 || project.peopleNeeded.skills.length > 0) && (
+            {project.peopleNeeded && project.peopleNeeded.roles.length > 0 && (
               <Card className="bg-gray-900/50 border-gray-800">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
@@ -330,38 +330,59 @@ export default function ProjectDetailPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {project.peopleNeeded.roles.length > 0 && (
-                      <div>
-                        <h4 className="text-gray-400 text-sm mb-2">Roles Required:</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {project.peopleNeeded.roles.map((role, index) => (
-                            <Badge
-                              key={index}
-                              variant="secondary"
-                              className="text-sm bg-purple-600/20 text-purple-400 border-purple-600/30"
-                            >
-                              {role}
-                            </Badge>
-                          ))}
+                    {project.peopleNeeded.roles.map((role) => {
+                      // Handle both old string format and new ProjectRole format
+                      const roleName = typeof role === 'string' ? role : role.name;
+                      const roleId = typeof role === 'string' ? role : role.id;
+                      const responsibilities = typeof role === 'string' ? [] : role.responsibilities;
+                      const skills = typeof role === 'string' ? [] : role.skills;
+                      const contributions = typeof role === 'string' ? [] : role.contributions;
+
+                      return (
+                        <div key={roleId} className="bg-gray-800/50 rounded-lg p-4 space-y-3">
+                          <h4 className="text-white font-medium">{roleName}</h4>
+
+                          {responsibilities.length > 0 && (
+                            <div>
+                              <h5 className="text-gray-400 text-sm mb-2">Responsibilities:</h5>
+                              <ul className="list-disc list-inside space-y-1">
+                                {responsibilities.map((resp, idx) => (
+                                  <li key={idx} className="text-gray-300 text-sm">{resp}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {skills.length > 0 && (
+                            <div>
+                              <h5 className="text-gray-400 text-sm mb-2">Required Skills:</h5>
+                              <div className="flex flex-wrap gap-1">
+                                {skills.map((skill, idx) => (
+                                  <Badge
+                                    key={idx}
+                                    variant="secondary"
+                                    className="text-xs bg-green-600/20 text-green-400 border-green-600/30"
+                                  >
+                                    {skill}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {contributions.length > 0 && (
+                            <div>
+                              <h5 className="text-gray-400 text-sm mb-2">Value Contribution:</h5>
+                              <ul className="list-disc list-inside space-y-1">
+                                {contributions.map((contrib, idx) => (
+                                  <li key={idx} className="text-gray-300 text-sm">{contrib}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    )}
-                    {project.peopleNeeded.skills.length > 0 && (
-                      <div>
-                        <h4 className="text-gray-400 text-sm mb-2">Required Skills:</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {project.peopleNeeded.skills.map((skill, index) => (
-                            <Badge
-                              key={index}
-                              variant="secondary"
-                              className="text-sm bg-green-600/20 text-green-400 border-green-600/30"
-                            >
-                              {skill}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                      );
+                    })}
                   </div>
                 </CardContent>
               </Card>
