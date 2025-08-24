@@ -7,12 +7,30 @@ import { ProjectForm } from '@/components/project-form';
 import { ProjectsList } from '@/components/projects-list';
 import { CreateProjectButton } from '@/components/create-project-button';
 import { ProjectProvider } from '@/lib/project-context';
+import { Project } from '@/lib/types';
 
 
 function DashboardContent() {
   const { user, loading: authLoading } = useAuth();
-  const { projects, loading: projectsLoading, error } = useProjects();
+  const { projects, loading: projectsLoading, error, updateProject, deleteProject } = useProjects();
   const [showProjectForm, setShowProjectForm] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
+
+  const handleEditProject = (project: Project) => {
+    setEditingProject(project);
+    setShowProjectForm(true);
+  };
+
+  const handleDeleteProject = async (projectId: string) => {
+    if (window.confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
+      try {
+        await deleteProject(projectId);
+      } catch (err) {
+        console.error('Error deleting project:', err);
+        alert('Failed to delete project. Please try again.');
+      }
+    }
+  };
 
   if (authLoading) {
     return (
@@ -66,15 +84,24 @@ function DashboardContent() {
           projects={projects}
           loading={projectsLoading}
           onCreateProject={() => setShowProjectForm(true)}
+          onEditProject={handleEditProject}
+          onDeleteProject={handleDeleteProject}
         />
       </main>
 
-      {/* Project Creation Form */}
+      {/* Project Creation/Edit Form */}
       <ProjectForm
+        project={editingProject}
         open={showProjectForm}
-        onOpenChange={setShowProjectForm}
+        onOpenChange={(open) => {
+          setShowProjectForm(open);
+          if (!open) {
+            setEditingProject(null);
+          }
+        }}
         onSuccess={() => {
           // Projects will be updated automatically via real-time subscription
+          setEditingProject(null);
         }}
       />
     </div>

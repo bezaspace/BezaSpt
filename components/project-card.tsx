@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Calendar, MapPin, Code, Target, TrendingUp, User } from 'lucide-react';
 
 interface ProjectCardProps {
-  project: Project;
+  project: Project & { creatorName?: string }; // Extend Project with optional creatorName
   onEdit?: (project: Project) => void;
   onDelete?: (projectId: string) => void;
   onClick?: (project: Project) => void;
@@ -230,39 +230,54 @@ export function ProjectCard({ project, onEdit, onDelete, onClick, clickable = fa
           </div>
         )}
 
+        {/* Creator and Date */}
         <div className="flex items-center justify-between text-xs text-gray-500">
+          {/* Show creator name only if it's available (browse page) */}
+          {project.creatorName && (
+            <div className="flex items-center gap-2">
+              <User className="h-3 w-3" />
+              <span>By {project.creatorName}</span>
+            </div>
+          )}
           <div className="flex items-center gap-2">
             <Calendar className="h-3 w-3" />
             <span>Created {formatDate(project.createdAt)}</span>
           </div>
+        </div>
+
+        {/* Status */}
+        <div className="flex items-center justify-end text-xs text-gray-500">
           <div className="flex items-center gap-2">
             <div className={`w-2 h-2 rounded-full ${getStatusColor(project.status)}`} />
             <span className="capitalize text-gray-400">{project.status}</span>
           </div>
         </div>
 
-        <div className="flex gap-2 pt-2">
-          {onEdit && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onEdit(project)}
-              className="flex-1 border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
-            >
-              Edit
-            </Button>
-          )}
-          {onDelete && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onDelete(project.id)}
-              className="flex-1 border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
-            >
-              Delete
-            </Button>
-          )}
-        </div>
+        {/* Edit and Delete buttons - only shown when onEdit and onDelete are provided */}
+        {(onEdit || onDelete) && (
+          <div className="flex gap-2 pt-2">
+            {onEdit && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onEdit(project)}
+                className="flex-1 border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
+              >
+                Edit
+              </Button>
+            )}
+            {onDelete && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onDelete(project.id)}
+                className="flex-1 border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
+              >
+                Delete
+              </Button>
+            )}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

@@ -10,10 +10,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, Filter, Grid, List } from 'lucide-react';
+import { fetchUserById } from '@/lib/user-utils';
+
+// Extended Project type with creator information
+interface ProjectWithCreator extends Project {
+  creatorName?: string;
+}
 
 export default function BrowseProjects() {
   const router = useRouter();
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<ProjectWithCreator[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -25,8 +31,27 @@ export default function BrowseProjects() {
     setError(null);
 
     const unsubscribe = subscribeToAllProjects(
-      (updatedProjects) => {
-        setProjects(updatedProjects);
+      async (updatedProjects) => {
+        // Fetch creator information for each project
+        const projectsWithCreators = await Promise.all(
+          updatedProjects.map(async (project) => {
+            try {
+              const creator = await fetchUserById(project.createdBy);
+              return {
+                ...project,
+                creatorName: creator?.displayName || 'Unknown User'
+              };
+            } catch (err) {
+              console.error('Error fetching creator data:', err);
+              return {
+                ...project,
+                creatorName: 'Unknown User'
+              };
+            }
+          })
+        );
+
+        setProjects(projectsWithCreators);
         setLoading(false);
       },
       (err) => {
@@ -160,8 +185,6 @@ export default function BrowseProjects() {
                 project={project}
                 clickable={true}
                 onClick={() => router.push(`/projects/${project.id}`)}
-                onEdit={() => {}} // Not used in browse mode
-                onDelete={() => {}} // Not used in browse mode
               />
             ))}
           </div>

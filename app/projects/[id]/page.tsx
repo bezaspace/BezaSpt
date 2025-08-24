@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { Project } from '@/lib/types';
 import { getProjectById } from '@/lib/firestore';
+import { fetchUserById } from '@/lib/user-utils';
 import { LoadingSpinner } from '@/components/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +18,7 @@ export default function ProjectDetailPage() {
   const router = useRouter();
   const { user } = useAuth();
   const [project, setProject] = useState<Project | null>(null);
+  const [creatorName, setCreatorName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,6 +39,15 @@ export default function ProjectDetailPage() {
           setError('Project not found');
         } else {
           setProject(projectData);
+          
+          // Fetch creator information
+          try {
+            const creator = await fetchUserById(projectData.createdBy);
+            setCreatorName(creator?.displayName || 'Unknown User');
+          } catch (creatorError) {
+            console.error('Error fetching creator data:', creatorError);
+            setCreatorName('Unknown User');
+          }
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load project');
@@ -542,7 +553,14 @@ export default function ProjectDetailPage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Creator Info */}
-            <Card className="bg-gray-900/50 border-gray-800">
+            <Card 
+              className={`bg-gray-900/50 border-gray-800 ${!isOwner && creatorName ? 'hover:border-gray-600 cursor-pointer transition-colors' : ''}`}
+              onClick={() => {
+                if (!isOwner && project && creatorName) {
+                  router.push(`/users/${project.createdBy}`);
+                }
+              }}
+            >
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <User className="h-4 w-4" />
@@ -555,7 +573,11 @@ export default function ProjectDetailPage() {
                     <User className="h-8 w-8 text-white" />
                   </div>
                   <p className="text-sm text-gray-400">
-                    {isOwner ? 'You are the creator of this project' : 'Created by another user'}
+                    {isOwner 
+                      ? 'You are the creator of this project' 
+                      : creatorName 
+                        ? `Created by ${creatorName}` 
+                        : 'Created by another user'}
                   </p>
                   {isOwner && (
                     <Badge className="mt-2 bg-green-600/20 text-green-400 border-green-600/30">
